@@ -203,8 +203,8 @@ var GF = function(){
 	Pacman.prototype.move = function() {
 	
 		// test3 / test4 / test7
-		// Tu código aquí
-		if (this.direccion == "d" && this.posX+this.radius>w){
+		//test3
+		/*if (this.direccion == "d" && this.posX+this.radius>w){
 			this.direccion = "i";
 		  this.posX -= this.speed;
 		} else if (this.direccion == "i" && this.posX+this.radius<0){
@@ -214,8 +214,24 @@ var GF = function(){
 			this.posX -= this.speed;
 		} else {
 			this.posX += this.speed;
+		}*/
+
+		//test4
+		if ((this.x+this.radius*2+this.speed>w && this.direccion=="right") || (this.x-this.speed<0 && this.direccion=="left") || (this.y+this.radius*2+this.speed>h && this.direccion=="down") || (this.y-this.speed<0 && this.direccion=="up")){
+			//Quieto
+
+		} else if (this.direccion == "right" ){
+    		
+		  	this.x += this.speed;
+		} else if (this.direccion == "left" ){
+		  	this.x -= this.speed;
+		} else if (this.direccion == "down" ){
+		  	this.y += this.speed;
+		} else if (this.direccion == "up" ){
+		  	this.y -= this.speed;
+		} else if (this.direccion == "space" ){
+		  	console.log("space");
 		}
-		
 		
 		// >=test8: introduce esta instrucción 
 		// dentro del código implementado en el test7:
@@ -336,7 +352,17 @@ var GF = function(){
 	var checkInputs = function(){
 		
 		// test4
-		// Tu código aquí (reestructúralo para el test7)
+		todosFalse = true;
+		for (let [key, value] of Object.entries(inputStates)) {
+	
+		  if (value){
+			player.direccion = key;
+			todosFalse = false;
+		  }
+		}
+		if (todosFalse){
+		  player.direccion = "";
+		}
 		
 		// test7
 		// Tu código aquí
@@ -434,7 +460,53 @@ var GF = function(){
     
 		// add the listener to the main, window object, and update the states
 		// test4
-		// Tu código aquí
+		document.onkeydown = function(evt) {
+			let key = evt.key;
+			if (key == "ArrowLeft") {
+			  evt.preventDefault();
+					  inputStates.left = true;
+	  
+			} else if (key == "ArrowRight") {
+			  evt.preventDefault();
+					  inputStates.right = true;
+	  
+			} else if (key == "ArrowDown") {
+			  evt.preventDefault();
+					  inputStates.down = true;
+	  
+			} else if (key == "ArrowUp") {
+			  evt.preventDefault();
+			  inputStates.up = true;
+	  
+			} else if (key == "Space") {
+			  evt.preventDefault();
+			  inputStates.space = true;
+			}
+		  }
+	  
+		  document.onkeyup = function(evt) {
+			let key = evt.key;
+			if (key == "ArrowLeft") {
+			  evt.preventDefault();
+					  inputStates.left = false;
+	  
+			} else if (key == "ArrowRight") {
+			  evt.preventDefault();
+					  inputStates.right = false;
+	  
+			} else if (key == "ArrowDown") {
+			  evt.preventDefault();
+					  inputStates.down = false;
+	  
+			} else if (key == "ArrowUp") {
+			  evt.preventDefault();
+			  inputStates.up = false;
+	  
+			} else if (key == "Space") {
+			  evt.preventDefault();
+			  inputStates.space = false;
+			}
+		  }
 	};
 	
 	

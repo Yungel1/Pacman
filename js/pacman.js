@@ -103,22 +103,59 @@ var GF = function(){
 
 		this.setMapTile = function(row, col, newValue){
 			// test5
-			// Tu código aquí
+			if (!this.map[row]) {
+      
+				this.map[row] = [];
+		
+			}
+		
+			  this.map[row][col] = newValue;
+			
 		};
 
 		this.getMapTile = function(row, col){
 			// test5
-			// Tu código aquí	
+			const column = this.map[row]
+			if (column) {
+			  return column[col];
+			}
+			return undefined;	
 		};
 
 		this.printMap = function(){
 			// test5
-			// Tu código aquí
+			console.log(this.map);
 		};
 
 		this.loadLevel = function(){
 			// test5
-			// Tu código aquí
+			//https://raw.githubusercontent.com/AinhoY/froga/main/1.txt
+			fetch('res/levels/1.txt').then(x => x.text()).then(txt => {
+
+				let lines = txt.split("\n");
+		  
+				let row = 0;
+				let elems;
+		  
+		  
+				for (let i = 0; i < lines.length; i++) {
+				  elems = lines[i].split(" ");
+				  if (elems[1]=="lvlwidth"){
+		  
+					this.lvlWidth = elems[2];
+				  } else if (elems[1]=="lvlheight"){
+					this.lvlHeight = elems[2];
+				  } else if (elems[0]!=""&&elems[0]!="#"){
+					for (let j = 0; j < elems.length; j++){
+					  if (elems[j]!=""){
+						this.setMapTile(row,j,elems[j]);
+					  }
+					}
+					row += 1;
+				  }
+		  
+				}
+			});
 			// leer res/levels/1.txt y guardarlo en el atributo map	
 			// haciendo uso de setMapTile
 		

@@ -176,7 +176,44 @@ var GF = function(){
 			};
 		
 			// test6
-			// Tu código aquí
+			var TILE_WIDTH = thisGame.TILE_WIDTH;
+			var TILE_HEIGHT = thisGame.TILE_HEIGHT;
+
+			var tileID = {
+				'door-h' : 20,
+				'door-v' : 21,
+				'pellet-power' : 3
+			};
+			// test6
+			ctx.fillStyle = "black";
+			ctx.fillRect(0,0,600,600);
+			for(let i = 0; i<thisGame.screenTileSize[0];i++){
+				for (let j = 0; j<thisGame.screenTileSize[1];j++){
+					let tile = this.getMapTile(i,j);
+				if (tile==0){//Vacío
+				
+				} else if (tile == 2){//píldora
+					ctx.beginPath();
+					ctx.arc(j*TILE_WIDTH+TILE_WIDTH/2, i*TILE_HEIGHT+TILE_HEIGHT/2, 5, 0, 2 * Math.PI, false);
+					ctx.closePath();
+					ctx.fillStyle = 'white';
+					ctx.fill();
+				} else if (tile == 3){//píldora de poder
+					ctx.beginPath();
+					ctx.arc(j*TILE_WIDTH+TILE_WIDTH/2, i*TILE_HEIGHT+TILE_HEIGHT/2, 5, 0, 2 * Math.PI, false);
+					ctx.closePath();
+					ctx.fillStyle = 'red';
+					ctx.fill();
+				} else if (tile == 4){//pacman
+
+				} else if (tile >= 100 && tile <= 199){//pared
+					ctx.fillStyle = "blue";
+							ctx.fillRect(j*TILE_WIDTH,i*TILE_HEIGHT,TILE_WIDTH,TILE_HEIGHT);
+				} else{//fantasma
+				
+				} 
+				}
+			}
 		};
 
 		// >=test7
@@ -332,7 +369,7 @@ var GF = function(){
 		},
 		
 		// >=test6
-		screenTileSize: [24, 21],
+		screenTileSize: [25, 21],//lo hemos cambiado
 		
 		// >=test5
 		TILE_WIDTH: 24, 

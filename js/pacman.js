@@ -109,7 +109,11 @@ var GF = function(){
 		
 			}
 		
-			  this.map[row][col] = newValue;
+			this.map[row][col] = newValue;
+
+			if (newValue == 2){
+				this.pellets++;
+			}
 			
 		};
 
@@ -166,52 +170,53 @@ var GF = function(){
 		// >=test6
          	this.drawMap = function(){
 
-	    		var TILE_WIDTH = thisGame.TILE_WIDTH;
-	    		var TILE_HEIGHT = thisGame.TILE_HEIGHT;
-	
-    			var tileID = {
-	    			'door-h' : 20,
-				'door-v' : 21,
-				'pellet-power' : 3
-			};
-		
-			// test6
-			var TILE_WIDTH = thisGame.TILE_WIDTH;
-			var TILE_HEIGHT = thisGame.TILE_HEIGHT;
-
-			var tileID = {
-				'door-h' : 20,
-				'door-v' : 21,
-				'pellet-power' : 3
-			};
-			// test6
-			ctx.fillStyle = "black";
-			ctx.fillRect(0,0,600,600);
-			for(let i = 0; i<thisGame.screenTileSize[0];i++){
-				for (let j = 0; j<thisGame.screenTileSize[1];j++){
-					let tile = this.getMapTile(i,j);
-				if (tile==0){//Vacío
+				var TILE_WIDTH = thisGame.TILE_WIDTH;
+				var TILE_HEIGHT = thisGame.TILE_HEIGHT;
+		  
+				var tileID = {
+					 'door-h': 20,
+				  'door-v': 21,
+				  'pellet-power': 3
+				};
+		  
+				// test6
+				ctx.fillStyle = "black";
+				ctx.fillRect(0,0,600,600);
+				this.powerPelletBlinkTimer++;
+				for(let i = 0; i<thisGame.screenTileSize[0];i++){
+					for (let j = 0; j<thisGame.screenTileSize[1];j++){
+						let tile = this.getMapTile(i,j);
+					if (tile==0){//Vacío
+					
+					} else if (tile == 2){//píldora
+						ctx.beginPath();
+						ctx.arc(j*TILE_WIDTH+TILE_WIDTH/2, i*TILE_HEIGHT+TILE_HEIGHT/2, 5, 0, 2 * Math.PI, false);
+						ctx.closePath();
+						ctx.fillStyle = 'white';
+						ctx.fill();
+					} else if (tile == 3){//píldora de poder
+						if(this.powerPelletBlinkTimer%60<30){
+							ctx.beginPath();
+							ctx.arc(j*TILE_WIDTH+TILE_WIDTH/2, i*TILE_HEIGHT+TILE_HEIGHT/2, 5, 0, 2 * Math.PI, false);
+							ctx.closePath();
+							ctx.fillStyle = 'red';
+							ctx.fill();
+						}
+					} else if (tile == 4){//pacman
+						player.homeX = j*TILE_WIDTH;
+						player.homeY = i*TILE_HEIGHT;
+						if(player.x == null && player.y == null){
+							player.x = player.homeX;
+							player.y = player.homeY;
+						}
 				
-				} else if (tile == 2){//píldora
-					ctx.beginPath();
-					ctx.arc(j*TILE_WIDTH+TILE_WIDTH/2, i*TILE_HEIGHT+TILE_HEIGHT/2, 5, 0, 2 * Math.PI, false);
-					ctx.closePath();
-					ctx.fillStyle = 'white';
-					ctx.fill();
-				} else if (tile == 3){//píldora de poder
-					ctx.beginPath();
-					ctx.arc(j*TILE_WIDTH+TILE_WIDTH/2, i*TILE_HEIGHT+TILE_HEIGHT/2, 5, 0, 2 * Math.PI, false);
-					ctx.closePath();
-					ctx.fillStyle = 'red';
-					ctx.fill();
-				} else if (tile == 4){//pacman
-
-				} else if (tile >= 100 && tile <= 199){//pared
-					ctx.fillStyle = "blue";
-							ctx.fillRect(j*TILE_WIDTH,i*TILE_HEIGHT,TILE_WIDTH,TILE_HEIGHT);
-				} else{//fantasma
-				
-				} 
+					
+					} else if (tile >= 100 && tile <= 199){//pared
+						ctx.fillStyle = "blue";
+								ctx.fillRect(j*TILE_WIDTH,i*TILE_HEIGHT,TILE_WIDTH,TILE_HEIGHT);
+					} else{//fantasma
+					
+					} 
 				}
 			}
 		};
@@ -219,15 +224,34 @@ var GF = function(){
 		// >=test7
 		this.isWall = function(row, col) {
 			// test7
-			// Tu código aquí
+			let tile = this.getMapTile(row,col);
+			if (tile >= 100 && tile <= 199){//pared
+						  return true
+			}
+			return false;
 		};
 
 		// >=test7
 		this.checkIfHitWall = function(possiblePlayerX, possiblePlayerY, row, col){
 			// test7
-			// Tu código aquí
-			// Determinar si el jugador va a moverse a una fila,columna que tiene pared 
-			// Hacer uso de isWall
+			let TILE_WIDTH = thisGame.TILE_WIDTH;
+			let TILE_HEIGHT = thisGame.TILE_HEIGHT;
+			
+			let x = possiblePlayerX/TILE_WIDTH;
+			let y = possiblePlayerY/TILE_HEIGHT;
+			
+			
+			let row1 = Math.ceil(y);
+			let col1 = Math.ceil(x);
+			let row2 = Math.floor(y);
+			let col2 = Math.floor(x);
+			
+			
+			if (this.isWall(row1,col1)||this.isWall(row1,col2)||this.isWall(row2,col1)||this.isWall(row2,col2)){
+				return true;
+			}
+	  
+			return false;
 		};
 		
 		// >=test11
@@ -246,8 +270,23 @@ var GF = function(){
 			};
 			
 			// test8
-			// Tu código aquí
-			// Gestiona la recogida de píldoras
+			let TILE_WIDTH = thisGame.TILE_WIDTH;
+			let TILE_HEIGHT = thisGame.TILE_HEIGHT;
+			
+			let x = playerX/TILE_WIDTH;
+			let y = playerY/TILE_HEIGHT;
+			
+			let posX = Math.floor(x);
+			let posY = Math.floor(y);
+					
+			if(this.getMapTile(posY,posX)==tileID.pellet){
+				this.setMapTile(posY,posX,0);
+				this.pellets--;
+			}
+			
+			if(this.pellets == 0){
+				console.log("Next level!");
+			}
 			
 			// test9
 			// Tu código aquí
@@ -265,12 +304,15 @@ var GF = function(){
 	// >=test2
 	var Pacman = function() {
 		this.radius = 10;
-		this.x = 0;
-		this.y = 0;
+		this.x = null;
+		this.y = null;
+		this.homeX = null;
+		this.homeY = null;
 		this.speed = 3;
 		this.angle1 = 0.25;
 		this.angle2 = 1.75;
-		this.direccion = "d";
+		this.direccion = "right";
+		this.direccionPrevia = ""; //test7
 	};
 	
 	// >=test3
@@ -291,7 +333,7 @@ var GF = function(){
 		}*/
 
 		//test4
-		if ((this.x+this.radius*2+this.speed>w && this.direccion=="right") || (this.x-this.speed<0 && this.direccion=="left") || (this.y+this.radius*2+this.speed>h && this.direccion=="down") || (this.y-this.speed<0 && this.direccion=="up")){
+		/*if ((this.x+this.radius*2+this.speed>w && this.direccion=="right") || (this.x-this.speed<0 && this.direccion=="left") || (this.y+this.radius*2+this.speed>h && this.direccion=="down") || (this.y-this.speed<0 && this.direccion=="up")){
 			//Quieto
 
 		} else if (this.direccion == "right" ){
@@ -305,6 +347,36 @@ var GF = function(){
 		  	this.y -= this.speed;
 		} else if (this.direccion == "space" ){
 		  	console.log("space");
+		}*/
+
+		// test7
+		let nearestRow = Math.floor(this.y/thisGame.TILE_HEIGHT);
+		let nearestCol = Math.floor(this.x/thisGame.TILE_WIDTH);
+		let x,y,xy;
+		
+	
+		xy = this.moveAux();
+		x = xy[0];
+		y = xy[1];
+		
+		if (!thisLevel.checkIfHitWall(x,y,nearestRow,nearestCol)){
+		
+			this.x = x;
+		  this.y = y;
+		  
+		} else {
+		
+			this.direccion = this.direccionPrevia;
+			xy = this.moveAux();
+			x = xy[0];
+			y = xy[1];
+		  
+			if (!thisLevel.checkIfHitWall(x,y,nearestRow,nearestCol)){
+	
+			  this.x = x;
+			  this.y = y;
+	
+			}
 		}
 		
 		// >=test8: introduce esta instrucción 
@@ -327,23 +399,53 @@ var GF = function(){
 		// Si chocamos contra un fantasma cuando éste esta en estado Ghost.NORMAL --> cambiar el modo de juego a HIT_GHOST
 
 	};
+
+	Pacman.prototype.moveAux = function() {
+  
+		let x,y;
+	  
+		  if (this.direccion == "right" ){
+				  x = this.x + this.speed;
+			y = this.y;
+			//console.log(nearestRow+","+nearestCol+","+y+","+x);
+			} else if (this.direccion == "left" ){
+				  x = this.x - this.speed;
+			y = this.y;
+			} else if (this.direccion == "down" ){
+				  y = this.y + this.speed;
+			x = this.x;
+			} else if (this.direccion == "up" ){
+				  y = this.y - this.speed;
+			x = this.x;
+			} else if (this.direccion == "space" ){
+				  console.log("space");
+			x = this.x;
+			y = this.y;
+			} else {
+				x = this.x;
+			y = this.y;
+		}
+		
+		return [x, y];
+	};
+	
 	
 	// >=test2
 	// Función para pintar el Pacman
 	// En el test2 se llama drawPacman(x, y) {
-	Pacman.prototype.draw = function() {
+	Pacman.prototype.draw = function(x,y) {
          
 		// Pac Man
 		// test2   
 		ctx.beginPath();
 
-		ctx.arc(this.posX+this.radius, this.posY+this.radius, this.radius, this.angle1 * Math.PI, this.angle2 * Math.PI,false);
-		ctx.lineTo(this.posX+this.radius, this.posY+this.radius);
+		ctx.arc(this.x+this.radius+2, this.y+this.radius+2, this.radius, this.angle1 * Math.PI, this.angle2 * Math.PI,false);
+		ctx.lineTo(this.x+this.radius+2, this.y+this.radius+2);
 		ctx.closePath();
 		ctx.fillStyle = "yellow";
 		ctx.fill();
 		ctx.strokeStyle = 'black';
-		ctx.stroke();		     
+		ctx.stroke();			     
 
 		// ojo: en el test2 esta función se llama drawPacman(x,y))
     	};
@@ -430,13 +532,14 @@ var GF = function(){
 		for (let [key, value] of Object.entries(inputStates)) {
 	
 		  if (value){
-			player.direccion = key;
-			todosFalse = false;
+      	player.direccionPrevia = player.direccion; //test7
+        player.direccion = key;
+        todosFalse = false;
 		  }
 		}
-		if (todosFalse){
+		/*if (todosFalse){
 		  player.direccion = "";
-		}
+		}*/
 		
 		// test7
 		// Tu código aquí
@@ -455,6 +558,7 @@ var GF = function(){
 		// actualiza modeTimer...
 	};
 	
+	var cont = 0;
 	// >=test1
 	var mainLoop = function(time){
     
@@ -488,10 +592,12 @@ var GF = function(){
 		// test10
 		// Tu código aquí
 		// Mover fantasmas
-		
+
 		// >=test3
 		//ojo: en el test3 esta instrucción es pacman.move()
-		player.move();
+		if(player.x != null && player.y != null){
+			player.move();
+		}
 
 
 		// test14
@@ -518,7 +624,9 @@ var GF = function(){
 
 		// >=test3
 		//ojo: en el test3 esta instrucción es pacman.draw()
-		player.draw();
+		if(player.x != null && player.y != null){
+			player.draw();
+		}
 		
 		// >=test12
 		updateTimers();
@@ -532,55 +640,55 @@ var GF = function(){
 	// >=test4
 	var addListeners = function(){
     
-		// add the listener to the main, window object, and update the states
-		// test4
-		document.onkeydown = function(evt) {
-			let key = evt.key;
-			if (key == "ArrowLeft") {
-			  evt.preventDefault();
-					  inputStates.left = true;
-	  
-			} else if (key == "ArrowRight") {
-			  evt.preventDefault();
-					  inputStates.right = true;
-	  
-			} else if (key == "ArrowDown") {
-			  evt.preventDefault();
-					  inputStates.down = true;
-	  
-			} else if (key == "ArrowUp") {
-			  evt.preventDefault();
-			  inputStates.up = true;
-	  
-			} else if (key == "Space") {
-			  evt.preventDefault();
-			  inputStates.space = true;
-			}
-		  }
-	  
-		  document.onkeyup = function(evt) {
-			let key = evt.key;
-			if (key == "ArrowLeft") {
-			  evt.preventDefault();
-					  inputStates.left = false;
-	  
-			} else if (key == "ArrowRight") {
-			  evt.preventDefault();
-					  inputStates.right = false;
-	  
-			} else if (key == "ArrowDown") {
-			  evt.preventDefault();
-					  inputStates.down = false;
-	  
-			} else if (key == "ArrowUp") {
-			  evt.preventDefault();
-			  inputStates.up = false;
-	  
-			} else if (key == "Space") {
-			  evt.preventDefault();
-			  inputStates.space = false;
-			}
-		  }
+				//add the listener to the main, window object, and update the states
+    // test4
+    document.onkeydown = function(evt) {
+		let key = evt.key;
+		if (key == "ArrowLeft") {
+		  evt.preventDefault();
+				  inputStates.left = true;
+  
+		} else if (key == "ArrowRight") {
+		  evt.preventDefault();
+				  inputStates.right = true;
+  
+		} else if (key == "ArrowDown") {
+		  evt.preventDefault();
+				  inputStates.down = true;
+  
+		} else if (key == "ArrowUp") {
+		  evt.preventDefault();
+		  inputStates.up = true;
+  
+		} else if (key == " ") {
+		  evt.preventDefault();
+		  inputStates.space = true;
+		}
+	  }
+  
+	  document.onkeyup = function(evt) {
+		let key = evt.key;
+		if (key == "ArrowLeft") {
+		  evt.preventDefault();
+				  inputStates.left = false;
+  
+		} else if (key == "ArrowRight") {
+		  evt.preventDefault();
+				  inputStates.right = false;
+  
+		} else if (key == "ArrowDown") {
+		  evt.preventDefault();
+				  inputStates.down = false;
+  
+		} else if (key == "ArrowUp") {
+		  evt.preventDefault();
+		  inputStates.up = false;
+  
+		} else if (key == " ") {
+		  evt.preventDefault();
+		  inputStates.space = false;
+		}
+	  }
 	};
 	
 	
@@ -593,9 +701,9 @@ var GF = function(){
 		// (x,y,velX,velY,state, speed)
 		
 		// test7
-		// Tu código aquí
-		// Inicialmente Pacman debe empezar a moverse en horizontal hacia la derecha, con una velocidad igual a su atributo speed
-		// inicializa la posición inicial de Pacman tal y como indica el enunciado
+		player.x = player.homeX;
+		player.y = player.homeY;
+		player.direccion = "right";
 	
 		// test10
 		// Tu código aquí
@@ -635,10 +743,10 @@ var GF = function(){
 		ghosts: ghosts, 
 		
 		// solo para el test12
-		thisLevel: thisLevel
+		thisLevel: thisLevel,
 		
 		// solo para el test 13
-		Ghost: Ghost
+		Ghost: Ghost,
 		
 		// solo para el test14
 		thisGame: thisGame

@@ -286,7 +286,7 @@ var GF = function(){
 						posY = Math.ceil(y);
 			} else if (player.direccion == "left" || player.direccion == "up"){
 				posX = Math.floor(x);
-						posY = Math.floor(y);
+						posY = Math.floor(y); 
 			}*/
           
 			if(this.getMapTile(posYround,posXround)==tileID.pellet){

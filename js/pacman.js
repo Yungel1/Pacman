@@ -263,34 +263,53 @@ var GF = function(){
 		// >=test8
 		this.checkIfHitSomething = function(playerX, playerY, row, col){
 			var tileID = {
-	    			'door-h' : 20,
+				'door-h' : 20,
 				'door-v' : 21,
 				'pellet-power' : 3,
 				'pellet': 2
 			};
-			
-			// test8
 			let TILE_WIDTH = thisGame.TILE_WIDTH;
 			let TILE_HEIGHT = thisGame.TILE_HEIGHT;
 			
 			let x = playerX/TILE_WIDTH;
 			let y = playerY/TILE_HEIGHT;
 			
+			
 			let posX = Math.floor(x);
 			let posY = Math.floor(y);
-					
-			if(this.getMapTile(posY,posX)==tileID.pellet){
-				this.setMapTile(posY,posX,0);
+			
+			let posXround = Math.round(x);
+			let posYround = Math.round(y);
+			
+			/*if (player.direccion == "right" || player.direccion == "down"){
+				posX = Math.ceil(x);
+						posY = Math.ceil(y);
+			} else if (player.direccion == "left" || player.direccion == "up"){
+				posX = Math.floor(x);
+						posY = Math.floor(y);
+			}*/
+          
+			if(this.getMapTile(posYround,posXround)==tileID.pellet){
+				this.setMapTile(posYround,posXround,0);
 				this.pellets--;
+			} else if (this.getMapTile(posY,posX)==tileID['door-v'] || this.getMapTile(posY+1,posX)==tileID['door-v']) {	// test9
+				if(posY == 0){
+					player.y = (thisGame.screenTileSize[0]-2)*TILE_HEIGHT;
+				} else{
+					player.y = TILE_HEIGHT;
+				} 
+      	
+			} else if (this.getMapTile(posY,posX)==tileID['door-h'] || this.getMapTile(posY,posX+1)==tileID['door-h']) {
+				if(posX == 0){
+					player.x = (thisGame.screenTileSize[1]-2)*TILE_WIDTH;
+				} else{
+					player.x = TILE_WIDTH;
+				} 
 			}
 			
 			if(this.pellets == 0){
 				console.log("Next level!");
-			}
-			
-			// test9
-			// Tu código aquí
-			// Gestiona las puertas teletransportadoras
+			} 
 			
 			// test12
 			// Tu código aquí

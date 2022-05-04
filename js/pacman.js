@@ -38,8 +38,8 @@ var GF = function(){
 	// >=test10
 	var Ghost = function(id, ctx){
 
-		this.x = 0;
-		this.y = 0;
+		this.x = null;
+		this.y = null;
 		this.velX = 0;
 		this.velY = 0;
 		this.speed = 1;
@@ -50,14 +50,39 @@ var GF = function(){
 		this.ctx = ctx;
 	
 		this.id = id;
-		this.homeX = 0;
-		this.homeY = 0;
+		this.homeX = null;
+		this.homeY = null;
 
 		this.draw = function(){
 			// test10
-			// Tu código aquí
-			// Pintar cuerpo de fantasma	
-			// Pintar ojos 
+			ctx.beginPath();
+			// This is where the curve begins (P0)
+			ctx.moveTo(this.x, this.y+TILE_HEIGHT);
+			ctx.quadraticCurveTo(this.x+3*TILE_WIDTH/9, this.y, this.x+TILE_WIDTH/2, this.y+2*TILE_HEIGHT/7);
+			ctx.moveTo(this.x+TILE_WIDTH/2, this.y+2*TILE_HEIGHT/7);
+			ctx.quadraticCurveTo(this.x+4*TILE_WIDTH/5, this.y, this.x+TILE_WIDTH, this.y+TILE_HEIGHT);
+			ctx.lineTo(this.x, this.y+TILE_HEIGHT);
+			ctx.closePath();
+			ctx.fillStyle = ghostcolor[this.id];
+			ctx.fill();
+			ctx.strokeStyle = ghostcolor[this.id];
+			ctx.stroke();
+			
+			//ojoDerecha
+			ctx.beginPath();
+			ctx.arc(this.x+3*TILE_WIDTH/5, this.y+3*TILE_HEIGHT/6, 3, 0, 2 * Math.PI);
+			ctx.closePath();
+			ctx.fillStyle = "white";
+			ctx.fill();
+			ctx.strokeStyle = "white"
+			ctx.stroke();
+			//ojoIzquierda
+			ctx.beginPath();
+			ctx.arc(this.x+3*TILE_WIDTH/12, this.y+3*TILE_HEIGHT/6, 3, 0, 2 * Math.PI);
+			ctx.closePath();
+			ctx.fillStyle = "white";
+			ctx.fill();
+	 
 	
 		
 			// test12 
@@ -73,7 +98,43 @@ var GF = function(){
 		
 		this.move = function() {
 			// test10
-			// Tu código aquí
+			let nextRow; 
+			let nextCol; 
+			let posX = this.x / TILE_WIDTH;
+			let posY = this.y / TILE_HEIGHT;
+				  // test10
+			if(posX % 1 == 0 && posY % 1 == 0){
+	  
+			  let possibleMoves = [[0,-1],[1,0],[0,1],[-1,0]];
+			  let move;
+			  let sol = [];
+			  for(let i = 0; i<possibleMoves.length;i++){
+				  move = possibleMoves[i];
+				  if (!thisLevel.isWall(posY+move[1],posX+move[0])){
+					sol.push(move);
+				}
+			  }
+	  
+			  if(this.velY<0 || this.velX<0){
+				nextRow = Math.floor((this.y + this.velY*this.speed)/TILE_HEIGHT); 
+				nextCol = Math.floor((this.x + this.velX*this.speed)/TILE_WIDTH); 
+			  } else {
+				nextRow = Math.ceil((this.y + this.velY*this.speed)/TILE_HEIGHT); 
+				nextCol = Math.ceil((this.x + this.velX*this.speed)/TILE_WIDTH); 
+			  }
+			  if (sol.length > 2) {
+				  let randomSol = Math.floor(Math.random() * sol.length);
+				this.velX = sol[randomSol][0];
+				this.velY = sol[randomSol][1];
+			  } else if (sol.lenght != 0 && (thisLevel.isWall(nextRow,nextCol)|| (this.velX==0 && this.velY==0))){
+				let randomSol = Math.floor(Math.random() * sol.length);
+				this.velX = sol[randomSol][0];
+				this.velY = sol[randomSol][1];
+			  }
+			} 
+	  
+			this.x = this.x + this.velX*this.speed;
+			this.y = this.y + this.velY*this.speed;
 
 		
 			// test13 
@@ -214,9 +275,39 @@ var GF = function(){
 					} else if (tile >= 100 && tile <= 199){//pared
 						ctx.fillStyle = "blue";
 								ctx.fillRect(j*TILE_WIDTH,i*TILE_HEIGHT,TILE_WIDTH,TILE_HEIGHT);
-					} else{//fantasma
-					
-					} 
+					} else if (tile == 10 ){//fantasma//test10(lo he puesto yo)
+						ghost = ghosts[0];
+						ghost.homeX = j*TILE_WIDTH;
+						ghost.homeY = i*TILE_HEIGHT;
+						if(ghost.x == null && ghost.y == null){
+						  ghost.x = ghost.homeX;
+						  ghost.y = ghost.homeY;
+						}
+					} else if (tile == 11 ){//fantasma//test10(lo he puesto yo)
+						ghost = ghosts[1];
+						ghost.homeX = j*TILE_WIDTH;
+						ghost.homeY = i*TILE_HEIGHT;
+						if(ghost.x == null && ghost.y == null){
+						  ghost.x = ghost.homeX;
+						  ghost.y = ghost.homeY;
+						}
+					}  else if (tile == 12 ){//fantasma//test10(lo he puesto yo)
+						ghost = ghosts[2];
+						ghost.homeX = j*TILE_WIDTH;
+						ghost.homeY = i*TILE_HEIGHT;
+						if(ghost.x == null && ghost.y == null){
+						  ghost.x = ghost.homeX;
+						  ghost.y = ghost.homeY;
+						}
+					} else if (tile == 13 ){//fantasma//test10(lo he puesto yo)
+						ghost = ghosts[3];
+						ghost.homeX = j*TILE_WIDTH;
+						ghost.homeY = i*TILE_HEIGHT;
+						if(ghost.x == null && ghost.y == null){
+						  ghost.x = ghost.homeX;
+						  ghost.y = ghost.homeY;
+						}
+					}
 				}
 			}
 		};
@@ -608,15 +699,30 @@ var GF = function(){
 		// >=test4
 		checkInputs();
 		
+		let ghostPacmanNull = false;
 		// test10
-		// Tu código aquí
-		// Mover fantasmas
+		for (var i=0; i < numGhosts; i++){
+			if(ghosts[i].x == null & ghosts[i].y == null){
+			ghostPacmanNull = true;
+			} 
+		}
+		if (player.x == null && player.y == null){
+			ghostPacmanNull = true;
+		} 
+		// test10
+		if(!ghostPacmanNull){
+			player.move();
+			for (var i=0; i < numGhosts; i++){
+				ghosts[i].move();
+			}
+		}
+		// Mover fantasmas (y Pacman)
 
 		// >=test3
 		//ojo: en el test3 esta instrucción es pacman.move()
-		if(player.x != null && player.y != null){
+		/*if(player.x != null && player.y != null){
 			player.move();
-		}
+		}*/
 
 
 		// test14
@@ -638,14 +744,20 @@ var GF = function(){
 		thisLevel.drawMap();
 
 		// test10
-		// Tu código aquí
-		// Pintar fantasmas
+		if(!ghostPacmanNull){
+			player.draw();
+			for (var i=0; i < numGhosts; i++){
+				ghosts[i].draw();
+			}
+		}
+		// Pintar fantasmas (y Pacman)
+
 
 		// >=test3
 		//ojo: en el test3 esta instrucción es pacman.draw()
-		if(player.x != null && player.y != null){
+		/*if(player.x != null && player.y != null){
 			player.draw();
-		}
+		}*/
 		
 		// >=test12
 		updateTimers();
@@ -725,7 +837,12 @@ var GF = function(){
 		player.direccion = "right";
 	
 		// test10
-		// Tu código aquí
+		for (var i=0; i < numGhosts; i++){
+			ghosts[i].x = ghosts[i].homeX;
+			ghosts[i].y = ghosts[i].homeY;
+			ghosts[i].velX = 0;
+			ghosts[i].velY = 0;
+		}
 		// Inicializa los atributos x,y, velX, velY, speed de la clase Ghost de forma conveniente
 		
 		// >=test14

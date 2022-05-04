@@ -348,7 +348,11 @@ var GF = function(){
 		// >=test11
 		this.checkIfHit = function(playerX, playerY, x, y, holgura){
 			// Test11
-			// Tu código aquí	
+			if (Math.abs(playerX - x) > holgura || Math.abs(playerY -y) > holgura){
+				return false;
+			}
+			console.log("siente el choque");
+			return true;
 		};
 
 		// >=test8
@@ -496,7 +500,9 @@ var GF = function(){
 		 thisLevel.checkIfHitSomething(this.x, this.y, this.nearestRow, this.nearestCol);
 		
 		// test11
-		// Tu código aquí
+		for (var i=0; i< numGhosts; i++){
+			thisLevel.checkIfHit(this.x,this.y,ghosts[i].x,ghosts[i].y,TILE_WIDTH/2);
+		}
 		// check for collisions with the ghosts
 		
 		// test13 

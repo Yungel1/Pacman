@@ -53,6 +53,8 @@ var GF = function(){
 		this.homeX = null;
 		this.homeY = null;
 
+		this.state = null;
+
 		this.draw = function(){
 			// test10
 			ctx.beginPath();
@@ -63,11 +65,29 @@ var GF = function(){
 			ctx.quadraticCurveTo(this.x+4*TILE_WIDTH/5, this.y, this.x+TILE_WIDTH, this.y+TILE_HEIGHT);
 			ctx.lineTo(this.x, this.y+TILE_HEIGHT);
 			ctx.closePath();
-			ctx.fillStyle = ghostcolor[this.id];
-			ctx.fill();
-			ctx.strokeStyle = ghostcolor[this.id];
-			ctx.stroke();
-			
+			 // test12 
+			if (this.state == Ghost.NORMAL){
+				ctx.fillStyle = ghostcolor[this.id];
+				ctx.fill();
+				ctx.strokeStyle = ghostcolor[this.id];
+				ctx.stroke();
+			  
+			} else if (this.state == Ghost.VULNERABLE){
+				if (thisGame.ghostTimer>100 || thisGame.ghostTimer%25<12){
+					ctx.fillStyle = ghostcolor[4];
+					ctx.fill();
+					ctx.strokeStyle = ghostcolor[4];
+					ctx.stroke();
+				}	else{
+					ctx.fillStyle = ghostcolor[5];
+					ctx.fill();
+					ctx.strokeStyle = ghostcolor[5];
+					ctx.stroke();
+				}
+			}
+			// Asegúrate de pintar el fantasma de un color u otro dependiendo del estado del fantasma y de thisGame.ghostTimer
+			// siguiendo el enunciado
+			 
 			//ojoDerecha
 			ctx.beginPath();
 			ctx.arc(this.x+3*TILE_WIDTH/5, this.y+3*TILE_HEIGHT/6, 3, 0, 2 * Math.PI);
@@ -82,13 +102,10 @@ var GF = function(){
 			ctx.closePath();
 			ctx.fillStyle = "white";
 			ctx.fill();
-	 
-	
-		
-			// test12 
-			// Tu código aquí
-			// Asegúrate de pintar el fantasma de un color u otro dependiendo del estado del fantasma y de thisGame.ghostTimer
-			// siguiendo el enunciado
+	   
+	   
+	   
+	   
 
 			// test13 
 			// Tu código aquí
@@ -316,7 +333,7 @@ var GF = function(){
 		this.isWall = function(row, col) {
 			// test7
 			let tile = this.getMapTile(row,col);
-			if (tile >= 100 && tile <= 199){//pared
+			if ((tile >= 100 && tile <= 199)||row<0||col<0||col >= this.lvlWidth||row >= this.lvlHeight){//pared
 						  return true
 			}
 			return false;
@@ -400,16 +417,18 @@ var GF = function(){
 				} else{
 					player.x = TILE_WIDTH;
 				} 
+			} else if (this.getMapTile(posYround,posXround)==tileID["pellet-power"]){//test12
+				this.setMapTile(posYround,posXround,0);
+			  	for (var i=0; i < numGhosts; i++){
+					ghosts[i].state = Ghost.VULNERABLE;
+				}
+			  	thisGame.ghostTimer = 360;
 			}
 			
 			if(this.pellets == 0){
 				console.log("Next level!");
 			} 
-			
-			// test12
-			// Tu código aquí
-			// Gestiona la recogida de píldoras de poder
-			// (cambia el estado de los fantasmas)
+		
 
 		};
 
@@ -666,7 +685,13 @@ var GF = function(){
 	// >=test12
 	var updateTimers = function(){
 		// test12
-		// Tu código aquí
+		if (thisGame.ghostTimer > 0){
+			thisGame.ghostTimer--;
+		} else {
+			for (var i=0; i < numGhosts; i++){
+			  ghosts[i].state = Ghost.NORMAL;
+			}
+		}
         	// Actualizar thisGame.ghostTimer (y el estado de los fantasmas, tal y como se especifica en el enunciado)
 
 		// test14
@@ -848,6 +873,7 @@ var GF = function(){
 			ghosts[i].y = ghosts[i].homeY;
 			ghosts[i].velX = 0;
 			ghosts[i].velY = 0;
+			ghosts[i].state = Ghost.NORMAL;
 		}
 		// Inicializa los atributos x,y, velX, velY, speed de la clase Ghost de forma conveniente
 		

@@ -539,18 +539,14 @@ var GF = function(){
 				ghosts[i].state=Ghost.SPECTACLES;
 			  // Si chocamos contra un fantasma y su estado es Ghost.VULNERABLE
 			  // cambiar velocidad del fantasma y pasarlo a modo Ghost.SPECTACLES
+			} else if(thisLevel.checkIfHit(this.x,this.y,ghosts[i].x,ghosts[i].y,TILE_WIDTH/2)&&ghosts[i].state==Ghost.NORMAL){
+				// test14
+				// Si chocamos contra un fantasma cuando éste esta en estado Ghost.NORMAL --> cambiar el modo de juego a HIT_GHOST
+				thisGame.setMode(thisGame.HIT_GHOST);
 			}
 		}
 		// check for collisions with the ghosts
 		
-		// test13 
-		// Tu código aquí 
-		// Si chocamos contra un fantasma y su estado es Ghost.VULNERABLE
-		// cambiar velocidad del fantasma y pasarlo a modo Ghost.SPECTACLES
-		
-		// test14 
-		// Tu código aquí. 
-		// Si chocamos contra un fantasma cuando éste esta en estado Ghost.NORMAL --> cambiar el modo de juego a HIT_GHOST
 
 	};
 
@@ -716,7 +712,7 @@ var GF = function(){
         	// Actualizar thisGame.ghostTimer (y el estado de los fantasmas, tal y como se especifica en el enunciado)
 
 		// test14
-		// Tu código aquí
+		thisGame.modeTimer++;
 		// actualiza modeTimer...
 	};
 	
@@ -744,80 +740,65 @@ var GF = function(){
 		// main function, called each frame 
 		measureFPS(time);
      
-		// test14
-		// Tu código aquí
-		// sólo en modo NORMAL
-		
-		// >=test4
-		checkInputs();
-		
-		let ghostPacmanNull = false;
-		// test10
-		for (var i=0; i < numGhosts; i++){
-			if(ghosts[i].x == null & ghosts[i].y == null){
-			ghostPacmanNull = true;
-			} 
-		}
-		if (player.x == null && player.y == null){
-			ghostPacmanNull = true;
-		} 
-		// test10
-		if(!ghostPacmanNull){
-			player.move();
+		if(thisGame.mode== thisGame.NORMAL){//test14
+			checkInputs();
+	  
+	  
+			let ghostPacmanNull = false;
+			// test10
 			for (var i=0; i < numGhosts; i++){
-				ghosts[i].move();
+			  if(ghosts[i].x == null & ghosts[i].y == null){
+				ghostPacmanNull = true;
+			  } 
 			}
-		}
-		// Mover fantasmas (y Pacman)
-
-		// >=test3
-		//ojo: en el test3 esta instrucción es pacman.move()
-		/*if(player.x != null && player.y != null){
-			player.move();
-		}*/
-
-
-		// test14
-		// Tu código aquí
-		// en modo HIT_GHOST
-		// seguir el enunciado...
-	
-		// test14	
-		// Tu código aquí
-		// en modo WAIT_TO_START
-		// seguir el enunciado...
-	
-
-		// >=test2
-		// Clear the canvas
-		clearCanvas();
-   
-   		// >=test6
-		thisLevel.drawMap();
-
-		// test10
-		if(!ghostPacmanNull){
+			if (player.x == null && player.y == null){
+			  ghostPacmanNull = true;
+			} 
+	  
+			// Mover fantasmas
+			if(!ghostPacmanNull){
+			  player.move();
+			  for (var i=0; i < numGhosts; i++){
+				ghosts[i].move();
+			  }
+			}
+	  
+			clearCanvas();
+	  
+			thisLevel.drawMap();
+	  
+			// Pintar fantasmas
+	  
+			if(!ghostPacmanNull){
+			  player.draw();
+			  for (var i=0; i < numGhosts; i++){
+				ghosts[i].draw();
+			  }
+			}
+	  
+		}else if(thisGame.mode== thisGame.HIT_GHOST){//test14
+			if(thisGame.modeTimer==90){
+				thisGame.lifes--;
+				reset();
+				thisGame.setMode(thisGame.WAIT_TO_START);
+			}
+		}else if(thisGame.mode== thisGame.WAIT_TO_START){//test14
+			clearCanvas();
+			thisLevel.drawMap();
 			player.draw();
 			for (var i=0; i < numGhosts; i++){
 				ghosts[i].draw();
 			}
+			if(thisGame.modeTimer==30){
+				thisGame.setMode(thisGame.NORMAL);
+			}
 		}
-		// Pintar fantasmas (y Pacman)
-
-
-		// >=test3
-		//ojo: en el test3 esta instrucción es pacman.draw()
-		/*if(player.x != null && player.y != null){
-			player.draw();
-		}*/
-		
-		// >=test12
-		updateTimers();
-		
-		
-		// call the animation loop every 1/60th of second
-		// comentar esta instrucción en el test3
-		requestAnimationFrame(mainLoop);
+		  
+		  
+		  updateTimers();
+		  
+			  // call the animation loop every 1/60th of second
+			  requestAnimationFrame(mainLoop);
 	};
 	
 	// >=test4
@@ -887,6 +868,7 @@ var GF = function(){
 		player.x = player.homeX;
 		player.y = player.homeY;
 		player.direccion = "right";
+		player.direccionPrevia = "right";
 	
 		// test10
 		for (var i=0; i < numGhosts; i++){

@@ -56,108 +56,120 @@ var GF = function(){
 		this.state = null;
 
 		this.draw = function(){
-			// test10
-			ctx.beginPath();
-			// This is where the curve begins (P0)
-			ctx.moveTo(this.x, this.y+TILE_HEIGHT);
-			ctx.quadraticCurveTo(this.x+3*TILE_WIDTH/9, this.y, this.x+TILE_WIDTH/2, this.y+2*TILE_HEIGHT/7);
-			ctx.moveTo(this.x+TILE_WIDTH/2, this.y+2*TILE_HEIGHT/7);
-			ctx.quadraticCurveTo(this.x+4*TILE_WIDTH/5, this.y, this.x+TILE_WIDTH, this.y+TILE_HEIGHT);
-			ctx.lineTo(this.x, this.y+TILE_HEIGHT);
-			ctx.closePath();
-			 // test12 
-			if (this.state == Ghost.NORMAL){
-				ctx.fillStyle = ghostcolor[this.id];
-				ctx.fill();
-				ctx.strokeStyle = ghostcolor[this.id];
-				ctx.stroke();
-			  
-			} else if (this.state == Ghost.VULNERABLE){
-				if (thisGame.ghostTimer>100 || thisGame.ghostTimer%25<12){
+			// test13
+			if (this.state != Ghost.SPECTACLES){
+				// test10
+				ctx.beginPath();
+				// This is where the curve begins (P0)
+				ctx.moveTo(this.x, this.y+TILE_HEIGHT);
+				ctx.quadraticCurveTo(this.x+3*TILE_WIDTH/9, this.y, this.x+TILE_WIDTH/2, this.y+2*TILE_HEIGHT/7);
+				ctx.moveTo(this.x+TILE_WIDTH/2, this.y+2*TILE_HEIGHT/7);
+				ctx.quadraticCurveTo(this.x+4*TILE_WIDTH/5, this.y, this.x+TILE_WIDTH, this.y+TILE_HEIGHT);
+				ctx.lineTo(this.x, this.y+TILE_HEIGHT);
+				ctx.closePath();
+				// test12 
+				if (this.state == Ghost.NORMAL){
+				  ctx.fillStyle = ghostcolor[this.id];
+				  ctx.fill();
+				  ctx.strokeStyle = ghostcolor[this.id];
+				  ctx.stroke();
+		
+				} else if (this.state == Ghost.VULNERABLE){
+				  if (thisGame.ghostTimer>100 || thisGame.ghostTimer%25<12){
 					ctx.fillStyle = ghostcolor[4];
 					ctx.fill();
 					ctx.strokeStyle = ghostcolor[4];
 					ctx.stroke();
-				}	else{
+				  }	else{
 					ctx.fillStyle = ghostcolor[5];
 					ctx.fill();
 					ctx.strokeStyle = ghostcolor[5];
 					ctx.stroke();
+				  }
 				}
-			}
-			// Asegúrate de pintar el fantasma de un color u otro dependiendo del estado del fantasma y de thisGame.ghostTimer
-			// siguiendo el enunciado
-			 
-			//ojoDerecha
-			ctx.beginPath();
-			ctx.arc(this.x+3*TILE_WIDTH/5, this.y+3*TILE_HEIGHT/6, 3, 0, 2 * Math.PI);
-			ctx.closePath();
-			ctx.fillStyle = "white";
-			ctx.fill();
-			ctx.strokeStyle = "white"
-			ctx.stroke();
-			//ojoIzquierda
-			ctx.beginPath();
-			ctx.arc(this.x+3*TILE_WIDTH/12, this.y+3*TILE_HEIGHT/6, 3, 0, 2 * Math.PI);
-			ctx.closePath();
-			ctx.fillStyle = "white";
-			ctx.fill();
+			  }
+			  
+			  //ojoDerecha
+			  ctx.beginPath();
+			  ctx.arc(this.x+3*TILE_WIDTH/5, this.y+3*TILE_HEIGHT/6, 3, 0, 2 * Math.PI);
+			  ctx.closePath();
+			  ctx.fillStyle = "white";
+			  ctx.fill();
+			  ctx.strokeStyle = "white"
+			  ctx.stroke();
+			  //ojoIzquierda
+			  ctx.beginPath();
+			  ctx.arc(this.x+3*TILE_WIDTH/12, this.y+3*TILE_HEIGHT/6, 3, 0, 2 * Math.PI);
+			  ctx.closePath();
+			  ctx.fillStyle = "white";
+			  ctx.fill();
 	   
-	   
-	   
-	   
-
-			// test13 
-			// Tu código aquí
-			// El cuerpo del fantasma sólo debe dibujarse cuando el estado del mismo es distinto a Ghost.SPECTACLES
 
 		}; // draw
 		
 		this.move = function() {
-			// test10
 			let nextRow; 
 			let nextCol; 
 			let posX = this.x / TILE_WIDTH;
 			let posY = this.y / TILE_HEIGHT;
-				  // test10
-			if(posX % 1 == 0 && posY % 1 == 0){
-	  
-			  let possibleMoves = [[0,-1],[1,0],[0,1],[-1,0]];
-			  let move;
-			  let sol = [];
-			  for(let i = 0; i<possibleMoves.length;i++){
-				  move = possibleMoves[i];
-				  if (!thisLevel.isWall(posY+move[1],posX+move[0])){
-					sol.push(move);
+
+      
+			if(this.state==Ghost.SPECTACLES){
+				if(this.x<this.homeX){
+					this.velX=1;
+					this.velY=0;
+				} else if (this.y<this.homeY){
+					this.velX=0;
+					this.velY=1;
+				} else if (this.x>this.homeX){
+					this.velX=-1;
+					this.velY=0;
+				} else if (this.y>this.homeY){
+					this.velX=0;
+					this.velY=-1;
 				}
-			  }
-	  
-			  if(this.velY<0 || this.velX<0){
-				nextRow = Math.floor((this.y + this.velY*this.speed)/TILE_HEIGHT); 
-				nextCol = Math.floor((this.x + this.velX*this.speed)/TILE_WIDTH); 
-			  } else {
-				nextRow = Math.ceil((this.y + this.velY*this.speed)/TILE_HEIGHT); 
-				nextCol = Math.ceil((this.x + this.velX*this.speed)/TILE_WIDTH); 
-			  }
-			  if (sol.length > 2) {
-				  let randomSol = Math.floor(Math.random() * sol.length);
-				this.velX = sol[randomSol][0];
-				this.velY = sol[randomSol][1];
-			  } else if (sol.lenght != 0 && (thisLevel.isWall(nextRow,nextCol)|| (this.velX==0 && this.velY==0))){
-				let randomSol = Math.floor(Math.random() * sol.length);
-				this.velX = sol[randomSol][0];
-				this.velY = sol[randomSol][1];
-			  }
-			} 
-	  
+				
+			}else{
+			
+				// test10
+				if(posX % 1 == 0 && posY % 1 == 0){
+					let possibleMoves = [[0,-1],[1,0],[0,1],[-1,0]];
+					let move;
+					let sol = [];
+					for(let i = 0; i<possibleMoves.length;i++){
+						move = possibleMoves[i];
+						if (!thisLevel.isWall(posY+move[1],posX+move[0])){
+						sol.push(move);
+						}
+					}
+
+					if(this.velY<0 || this.velX<0){
+						nextRow = Math.floor((this.y + this.velY*this.speed)/TILE_HEIGHT); 
+						nextCol = Math.floor((this.x + this.velX*this.speed)/TILE_WIDTH); 
+					} else {
+						nextRow = Math.ceil((this.y + this.velY*this.speed)/TILE_HEIGHT); 
+						nextCol = Math.ceil((this.x + this.velX*this.speed)/TILE_WIDTH); 
+					}
+
+					if (sol.length > 2) {
+						let randomSol = Math.floor(Math.random() * sol.length);
+						this.velX = sol[randomSol][0];
+						this.velY = sol[randomSol][1];
+					} else if (sol.lenght != 0 && (thisLevel.isWall(nextRow,nextCol)|| (this.velX==0 && this.velY==0))){
+						let randomSol = Math.floor(Math.random() * sol.length);
+						this.velX = sol[randomSol][0];
+						this.velY = sol[randomSol][1];
+					}
+				} 
+			}
+
 			this.x = this.x + this.velX*this.speed;
 			this.y = this.y + this.velY*this.speed;
-
-		
 			// test13 
-			// Tu código aquí
-			// Si el estado del fantasma es Ghost.SPECTACLES
-			// Mover el fantasma lo más recto posible hacia la casilla de salida
+			if(this.state == Ghost.SPECTACLES && this.x==this.homeX  && this.y==this.homeY){
+				this.state = Ghost.NORMAL;
+			}
+
 		};
 
 	}; // fin clase Ghost
@@ -420,7 +432,9 @@ var GF = function(){
 			} else if (this.getMapTile(posYround,posXround)==tileID["pellet-power"]){//test12
 				this.setMapTile(posYround,posXround,0);
 			  	for (var i=0; i < numGhosts; i++){
-					ghosts[i].state = Ghost.VULNERABLE;
+					if(ghosts[i].state == Ghost.NORMAL){
+						ghosts[i].state = Ghost.VULNERABLE;
+					}
 				}
 			  	thisGame.ghostTimer = 360;
 			}
@@ -520,7 +534,12 @@ var GF = function(){
 		
 		// test11
 		for (var i=0; i< numGhosts; i++){
-			thisLevel.checkIfHit(this.x,this.y,ghosts[i].x,ghosts[i].y,TILE_WIDTH/2);
+			//test13
+			if(thisLevel.checkIfHit(this.x,this.y,ghosts[i].x,ghosts[i].y,TILE_WIDTH/2)&&ghosts[i].state==Ghost.VULNERABLE){
+				ghosts[i].state=Ghost.SPECTACLES;
+			  // Si chocamos contra un fantasma y su estado es Ghost.VULNERABLE
+			  // cambiar velocidad del fantasma y pasarlo a modo Ghost.SPECTACLES
+			}
 		}
 		// check for collisions with the ghosts
 		
@@ -689,7 +708,9 @@ var GF = function(){
 			thisGame.ghostTimer--;
 		} else {
 			for (var i=0; i < numGhosts; i++){
-			  ghosts[i].state = Ghost.NORMAL;
+				if(ghosts[i].state == Ghost.VULNERABLE){
+					ghosts[i].state = Ghost.NORMAL;
+				}
 			}
 		}
         	// Actualizar thisGame.ghostTimer (y el estado de los fantasmas, tal y como se especifica en el enunciado)

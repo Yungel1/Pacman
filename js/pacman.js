@@ -414,6 +414,7 @@ var GF = function(){
 			}*/
           
 			if(this.getMapTile(posYround,posXround)==tileID.pellet){
+				thisGame.addToScore(10);
 				this.setMapTile(posYround,posXround,0);
 				this.pellets--;
 			} else if (this.getMapTile(posY,posX)==tileID['door-v'] || this.getMapTile(posY+1,posX)==tileID['door-v']) {	// test9
@@ -430,6 +431,7 @@ var GF = function(){
 					player.x = TILE_WIDTH;
 				} 
 			} else if (this.getMapTile(posYround,posXround)==tileID["pellet-power"]){//test12
+				thisGame.addToScore(50);
 				this.setMapTile(posYround,posXround,0);
 			  	for (var i=0; i < numGhosts; i++){
 					if(ghosts[i].state == Ghost.NORMAL){
@@ -444,6 +446,54 @@ var GF = function(){
 			} 
 		
 
+		};
+
+		this.displayScore = function(){
+			//score
+			this.ctx.font = "bold 20px Arial";
+			this.ctx.fillStyle = "red";
+			this.ctx.textAlign = "center";
+			this.ctx.fillText("SCORE:", 80, 18);
+			//score points
+			this.ctx.font = "bold 20px Arial";
+			this.ctx.fillStyle = "white";
+			this.ctx.textAlign = "center";
+			this.ctx.fillText(thisGame.points, 170, 18);
+			//highscore
+			this.ctx.font = "bold 20px Arial";
+			this.ctx.fillStyle = "red";
+			this.ctx.textAlign = "center";
+			this.ctx.fillText("HIGH SCORE:", 360, 18);
+			//highscore points
+			this.ctx.font = "bold 20px Arial";
+			this.ctx.fillStyle = "white";
+			this.ctx.textAlign = "center";
+			this.ctx.fillText(thisGame.highscore, 460, 18);
+			//lifes
+			this.ctx.font = "bold 20px Arial";
+			this.ctx.fillStyle = "white";
+			this.ctx.textAlign = "center";
+			this.ctx.fillText("LIFES: ", 38, 595);
+			//lifes pacman
+			let posX = 85;
+			for(let i=0;i<thisGame.lifes;i++){
+				this.ctx.beginPath();
+
+				this.ctx.arc(posX+i*TILE_WIDTH, 588, 10, 0.25 * Math.PI, 1.75 * Math.PI,false);
+				this.ctx.lineTo(posX+i*TILE_WIDTH, 588);
+				this.ctx.closePath();
+				this.ctx.fillStyle = "yellow";
+				this.ctx.fill();
+				this.ctx.strokeStyle = 'black';
+				this.ctx.stroke();
+			}
+		};
+
+		this.gameOver = function(){
+			this.ctx.font = "bold 55px Arial";
+			this.ctx.fillStyle = "red";
+			this.ctx.textAlign = "center";
+			this.ctx.fillText("GAME OVER", 250, 300);
 		};
 
 	}; // end Level 
@@ -537,6 +587,7 @@ var GF = function(){
 			//test13
 			if(thisLevel.checkIfHit(this.x,this.y,ghosts[i].x,ghosts[i].y,TILE_WIDTH/2)&&ghosts[i].state==Ghost.VULNERABLE){
 				ghosts[i].state=Ghost.SPECTACLES;
+				thisGame.addToScore(200);
 			  // Si chocamos contra un fantasma y su estado es Ghost.VULNERABLE
 			  // cambiar velocidad del fantasma y pasarlo a modo Ghost.SPECTACLES
 			} else if(thisLevel.checkIfHit(this.x,this.y,ghosts[i].x,ghosts[i].y,TILE_WIDTH/2)&&ghosts[i].state==Ghost.NORMAL){
@@ -554,25 +605,33 @@ var GF = function(){
   
 		let x,y;
 	  
-		  if (this.direccion == "right" ){
-				  x = this.x + this.speed;
+		if (this.direccion == "right" ){
+			x = this.x + this.speed;
 			y = this.y;
-			//console.log(nearestRow+","+nearestCol+","+y+","+x);
-			} else if (this.direccion == "left" ){
-				  x = this.x - this.speed;
+			this.angle1 = 0.25;
+			this.angle2 = 1.75;
+		//console.log(nearestRow+","+nearestCol+","+y+","+x);
+		} else if (this.direccion == "left" ){
+			x = this.x - this.speed;
 			y = this.y;
-			} else if (this.direccion == "down" ){
-				  y = this.y + this.speed;
+			this.angle1 = 1.25;
+			this.angle2 = 0.75;
+		} else if (this.direccion == "down" ){
+			y = this.y + this.speed;
 			x = this.x;
-			} else if (this.direccion == "up" ){
-				  y = this.y - this.speed;
+			this.angle1 = -1.25;
+			this.angle2 = -1.75;
+		} else if (this.direccion == "up" ){
+			y = this.y - this.speed;
 			x = this.x;
-			} else if (this.direccion == "space" ){
-				  console.log("space");
+			this.angle1 = 1.75;
+			this.angle2 = 1.25;
+		} else if (this.direccion == "space" ){
+			console.log("space");
 			x = this.x;
 			y = this.y;
-			} else {
-				x = this.x;
+		} else {
+			x = this.x;
 			y = this.y;
 		}
 		
@@ -613,13 +672,17 @@ var GF = function(){
 		getLevelNum : function(){
 			return 0;
 		},
-		
 		// >=test14
 	        setMode : function(mode) {
 			this.mode = mode;
 			this.modeTimer = 0;
 		},
-		
+		lifes: 3,
+		points: 0,
+		highscore: 0,
+		addToScore: function(puntos_a_sumar){
+			this.points+=puntos_a_sumar;
+		},
 		// >=test6
 		screenTileSize: [25, 21],//lo hemos cambiado
 		
@@ -740,7 +803,7 @@ var GF = function(){
 		// main function, called each frame 
 		measureFPS(time);
      
-		if(thisGame.mode== thisGame.NORMAL){//test14
+		if(thisGame.mode==thisGame.NORMAL){//test14
 			checkInputs();
 	  
 	  
@@ -779,8 +842,12 @@ var GF = function(){
 		}else if(thisGame.mode== thisGame.HIT_GHOST){//test14
 			if(thisGame.modeTimer==90){
 				thisGame.lifes--;
-				reset();
-				thisGame.setMode(thisGame.WAIT_TO_START);
+				if (thisGame.lifes==0){
+					thisGame.setMode(thisGame.GAME_OVER);
+				} else{
+					reset();
+					thisGame.setMode(thisGame.WAIT_TO_START);
+				}
 			}
 		}else if(thisGame.mode== thisGame.WAIT_TO_START){//test14
 			clearCanvas();
@@ -792,13 +859,25 @@ var GF = function(){
 			if(thisGame.modeTimer==30){
 				thisGame.setMode(thisGame.NORMAL);
 			}
+		} else if(thisGame.mode == thisGame.GAME_OVER){
+			//punto12
+			clearCanvas();
+			thisLevel.drawMap();
+			player.draw();
+			for (var i=0; i < numGhosts; i++){
+				ghosts[i].draw();
+			}
+			thisLevel.gameOver();
 		}
 		  
-		  
-		  updateTimers();
-		  
-			  // call the animation loop every 1/60th of second
-			  requestAnimationFrame(mainLoop);
+		//punto12
+		thisLevel.displayScore();
+
+		updateTimers();
+
+
+		// call the animation loop every 1/60th of second
+		requestAnimationFrame(mainLoop);
 	};
 	
 	// >=test4

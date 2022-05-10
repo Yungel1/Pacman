@@ -646,17 +646,26 @@ var GF = function(){
          
 		// Pac Man
 		// test2   
-		ctx.beginPath();
-
-		ctx.arc(this.x+this.radius+2, this.y+this.radius+2, this.radius, this.angle1 * Math.PI, this.angle2 * Math.PI,false);
-		ctx.lineTo(this.x+this.radius+2, this.y+this.radius+2);
-		ctx.closePath();
-		ctx.fillStyle = "yellow";
-		ctx.fill();
-		ctx.strokeStyle = 'black';
-		ctx.stroke();			     
-
-		// ojo: en el test2 esta función se llama drawPacman(x,y))
+		if(thisGame.modeTimer%30<15||thisGame.mode==thisGame.GAME_OVER){
+			ctx.beginPath();
+	  
+			ctx.arc(this.x+this.radius+2, this.y+this.radius+2, this.radius, this.angle1 * Math.PI, this.angle2 * Math.PI,false);
+			ctx.lineTo(this.x+this.radius+2, this.y+this.radius+2);
+			ctx.closePath();
+			ctx.fillStyle = "yellow";
+			ctx.fill();
+			ctx.strokeStyle = 'black';
+			ctx.stroke();
+		  } else{
+			ctx.beginPath();
+	  
+			ctx.arc(this.x+this.radius+2, this.y+this.radius+2, this.radius, 0, 2 * Math.PI,false);
+			ctx.closePath();
+			ctx.fillStyle = "yellow";
+			ctx.fill();
+			ctx.strokeStyle = 'black';
+			ctx.stroke();
+		  }
     	};
     	
     	// >=test5

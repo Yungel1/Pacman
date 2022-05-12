@@ -416,9 +416,11 @@ var GF = function(){
 				thisGame.addToScore(10);
 				this.setMapTile(posYround,posXround,0);
 				this.pellets--;
-				//música perder una vida
-				tocar("res/sounds/eat.mp3","efecto");
+				//música comer píldora pequeña
+				tocar("res/sounds/eat.mp3","comida");
 			} else if (this.getMapTile(posY,posX)==tileID['door-v'] || this.getMapTile(posY+1,posX)==tileID['door-v']) {	// test9
+				//música atravesar portal
+				tocar("res/sounds/teleport.mp3","portal");
 				if(posY == 0){
 					player.y = (thisGame.screenTileSize[0]-2)*TILE_HEIGHT;
 				} else{
@@ -426,12 +428,16 @@ var GF = function(){
 				} 
       	
 			} else if (this.getMapTile(posY,posX)==tileID['door-h'] || this.getMapTile(posY,posX+1)==tileID['door-h']) {
+				//música atravesar portal
+				tocar("res/sounds/teleport.mp3","portal");
 				if(posX == 0){
 					player.x = (thisGame.screenTileSize[1]-2)*TILE_WIDTH;
 				} else{
 					player.x = TILE_WIDTH;
 				} 
 			} else if (this.getMapTile(posYround,posXround)==tileID["pellet-power"]){//test12
+				//música comer píldora grande
+				tocar("res/sounds/eat_grande.mp3","comidaGrande");
 				thisGame.addToScore(50);
 				this.setMapTile(posYround,posXround,0);
 			  	for (var i=0; i < numGhosts; i++){
@@ -589,7 +595,7 @@ var GF = function(){
 	
 			} else if(!this.choque){
 				//música pared
-				tocar("res/sounds/golpe_pared.mp3","efecto");
+				tocar("res/sounds/golpe_pared.mp3","pared");
 				this.choque = true;
 			}
 		}
@@ -605,7 +611,7 @@ var GF = function(){
 			//test13
 			if(thisLevel.checkIfHit(this.x,this.y,ghosts[i].x,ghosts[i].y,TILE_WIDTH/2)&&ghosts[i].state==Ghost.VULNERABLE){
 				//música comer fantasma
-				tocar("res/sounds/comer_fantasma.mp3","efecto");
+				tocar("res/sounds/fantasma.mp3","fantasma");
 				ghosts[i].state=Ghost.SPECTACLES;
 				thisGame.addToScore(200);
 			  // Si chocamos contra un fantasma y su estado es Ghost.VULNERABLE
@@ -738,7 +744,12 @@ var GF = function(){
 	
 
 	let musicaFondo = new Audio();
-	let musicaEfecto = new Audio();
+	let musicaComida = new Audio();
+	let musicaFantasma = new Audio();
+	let musicaPared = new Audio();
+	let musicaVida = new Audio();
+	let musicaPortal = new Audio();
+	let musicaComidaGrande = new Audio();
 
 	var tocar = function(url,tipo){
 
@@ -747,11 +758,36 @@ var GF = function(){
 
 	var loadAudio = function(url,tipo){
 		return new Promise(resolve => {
-			if (tipo=="efecto") {
-				musicaEfecto.addEventListener('canplaythrough',() =>{
-					resolve(musicaEfecto);
+			if (tipo=="comida") {
+				musicaComida.addEventListener('canplaythrough',() =>{
+					resolve(musicaComida);
 				});
-				musicaEfecto.src = url;
+				musicaComida.src = url;
+			} else if (tipo=="fantasma"){
+				musicaFantasma.addEventListener('canplaythrough',() =>{
+					resolve(musicaFantasma);
+				});
+				musicaFantasma.src = url;
+			} else if(tipo=="pared"){
+				musicaPared.addEventListener('canplaythrough',() =>{
+					resolve(musicaPared);
+				});
+				musicaPared.src = url;
+			} else if(tipo=="vida"){
+				musicaVida.addEventListener('canplaythrough',() =>{
+					resolve(musicaVida);
+				});
+				musicaVida.src = url;
+			} else if(tipo=="portal"){
+				musicaPortal.addEventListener('canplaythrough',() =>{
+					resolve(musicaPortal);
+				});
+				musicaPortal.src = url;
+			} else if(tipo=="comidaGrande"){
+				musicaComidaGrande.addEventListener('canplaythrough',() =>{
+					resolve(musicaComidaGrande);
+				});
+				musicaComidaGrande.src = url;
 			} else{
 				musicaFondo.addEventListener('canplaythrough',() =>{
 					resolve(musicaFondo);
@@ -899,7 +935,7 @@ var GF = function(){
 			if(thisGame.modeTimer==90){
 				thisGame.lifes--;
 				//música perder una vida
-				tocar("res/sounds/pierde_vida.mp3","efecto");
+				tocar("res/sounds/pierde_vida.mp3","vida");
 				if (thisGame.lifes==0){
 					thisGame.setMode(thisGame.GAME_OVER);
 					//música game over

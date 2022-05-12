@@ -521,6 +521,7 @@ var GF = function(){
 		this.angle2 = 1.75;
 		this.direccion = "right";
 		this.direccionPrevia = ""; //test7
+		this.choque = false;
 	};
 	
 	// >=test3
@@ -571,6 +572,7 @@ var GF = function(){
 		
 			this.x = x;
 		  	this.y = y;
+			this.choque = false;
 		  
 		} else {
 		
@@ -583,10 +585,12 @@ var GF = function(){
 	
 			  this.x = x;
 			  this.y = y;
+			  this.choque = false;
 	
-			} else{
+			} else if(!this.choque){
 				//música pared
 				tocar("res/sounds/golpe_pared.mp3","efecto");
+				this.choque = true;
 			}
 		}
 		

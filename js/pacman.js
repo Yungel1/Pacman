@@ -416,6 +416,8 @@ var GF = function(){
 				thisGame.addToScore(10);
 				this.setMapTile(posYround,posXround,0);
 				this.pellets--;
+				//música perder una vida
+				tocar("res/sounds/eat.mp3","efecto");
 			} else if (this.getMapTile(posY,posX)==tileID['door-v'] || this.getMapTile(posY+1,posX)==tileID['door-v']) {	// test9
 				if(posY == 0){
 					player.y = (thisGame.screenTileSize[0]-2)*TILE_HEIGHT;
@@ -440,9 +442,11 @@ var GF = function(){
 			  	thisGame.ghostTimer = 360;
 			}
 			
-			if(this.pellets == 0){
+			if(this.pellets == 0 && thisGame.mode!=thisGame.VICTORY){
 				console.log("Next level!");
 				thisGame.setMode(thisGame.VICTORY);
+				//música victory
+				tocar("res/sounds/victory.mp3","fondo");
 			} 
 		
 
@@ -566,7 +570,7 @@ var GF = function(){
 		if (!thisLevel.checkIfHitWall(x,y,nearestRow,nearestCol)){
 		
 			this.x = x;
-		  this.y = y;
+		  	this.y = y;
 		  
 		} else {
 		
@@ -580,6 +584,9 @@ var GF = function(){
 			  this.x = x;
 			  this.y = y;
 	
+			} else{
+				//música pared
+				tocar("res/sounds/golpe_pared.mp3","efecto");
 			}
 		}
 		
@@ -593,6 +600,8 @@ var GF = function(){
 		for (var i=0; i< numGhosts; i++){
 			//test13
 			if(thisLevel.checkIfHit(this.x,this.y,ghosts[i].x,ghosts[i].y,TILE_WIDTH/2)&&ghosts[i].state==Ghost.VULNERABLE){
+				//música comer fantasma
+				tocar("res/sounds/comer_fantasma.mp3","efecto");
 				ghosts[i].state=Ghost.SPECTACLES;
 				thisGame.addToScore(200);
 			  // Si chocamos contra un fantasma y su estado es Ghost.VULNERABLE
@@ -726,7 +735,7 @@ var GF = function(){
 
 	let musicaFondo = new Audio();
 	let musicaEfecto = new Audio();
-	
+
 	var tocar = function(url,tipo){
 
 		loadAudio(url,tipo).then( audio => audio.play());
@@ -740,7 +749,7 @@ var GF = function(){
 				});
 				musicaEfecto.src = url;
 			} else{
-				musicaFondo.addEventListener('canplaytrough',() =>{
+				musicaFondo.addEventListener('canplaythrough',() =>{
 					resolve(musicaFondo);
 				});
 				musicaFondo.src = url;
@@ -885,8 +894,12 @@ var GF = function(){
 		}else if(thisGame.mode== thisGame.HIT_GHOST){//test14
 			if(thisGame.modeTimer==90){
 				thisGame.lifes--;
+				//música perder una vida
+				tocar("res/sounds/pierde_vida.mp3","efecto");
 				if (thisGame.lifes==0){
 					thisGame.setMode(thisGame.GAME_OVER);
+					//música game over
+					tocar("res/sounds/game_over.mp3","fondo");
 				} else{
 					reset();
 					thisGame.setMode(thisGame.WAIT_TO_START);
@@ -911,8 +924,6 @@ var GF = function(){
 				ghosts[i].draw();
 			}
 			thisLevel.gameOver();
-			//música game over
-			tocar("res/sounds/game_over.mp3","fondo");
 		} else if(thisGame.mode == thisGame.VICTORY){
 			//punto12
 			clearCanvas();
@@ -1061,9 +1072,22 @@ var GF = function(){
 	};
 };
 
+ctx.font = "bold 55px Arial";
+ctx.fillStyle = "white";
+ctx.textAlign = "center";
+ctx.fillText("CLICK TO START", 250, 300);
+
+document.addEventListener("click", function click(){
+
+    var game = new GF();
+    game.start();
+	document.removeEventListener("click",click);
+
+})
+
 // >=test1
-var game = new GF();
-game.start();
+//var game = new GF();
+//game.start();
 
 
 

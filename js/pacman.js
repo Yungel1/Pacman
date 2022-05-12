@@ -380,7 +380,6 @@ var GF = function(){
 			if (Math.abs(playerX - x) > holgura || Math.abs(playerY -y) > holgura){
 				return false;
 			}
-			console.log("siente el choque");
 			return true;
 		};
 
@@ -443,6 +442,7 @@ var GF = function(){
 			
 			if(this.pellets == 0){
 				console.log("Next level!");
+				thisGame.setMode(thisGame.VICTORY);
 			} 
 		
 
@@ -494,6 +494,13 @@ var GF = function(){
 			this.ctx.fillStyle = "red";
 			this.ctx.textAlign = "center";
 			this.ctx.fillText("GAME OVER", 250, 300);
+		};
+
+		this.victory = function(){
+			this.ctx.font = "bold 55px Arial";
+			this.ctx.fillStyle = "green";
+			this.ctx.textAlign = "center";
+			this.ctx.fillText("VICTORY", 260, 300);
 		};
 
 	}; // end Level 
@@ -646,7 +653,7 @@ var GF = function(){
          
 		// Pac Man
 		// test2   
-		if(thisGame.modeTimer%30<15||thisGame.mode==thisGame.GAME_OVER){
+		if(thisGame.modeTimer%30<15||thisGame.mode==thisGame.GAME_OVER||thisGame.mode==thisGame.VICTORY){
 			ctx.beginPath();
 	  
 			ctx.arc(this.x+this.radius+2, this.y+this.radius+2, this.radius, this.angle1 * Math.PI, this.angle2 * Math.PI,false);
@@ -707,6 +714,7 @@ var GF = function(){
 		HIT_GHOST : 2,
 		GAME_OVER : 3,
 		WAIT_TO_START: 4,
+		VICTORY: 5,
 		modeTimer: 0
 	};
 	
@@ -877,6 +885,15 @@ var GF = function(){
 				ghosts[i].draw();
 			}
 			thisLevel.gameOver();
+		} else if(thisGame.mode == thisGame.VICTORY){
+			//punto12
+			clearCanvas();
+			thisLevel.drawMap();
+			player.draw();
+			for (var i=0; i < numGhosts; i++){
+				ghosts[i].draw();
+			}
+			thisLevel.victory();
 		}
 		  
 		//punto12

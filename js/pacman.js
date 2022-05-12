@@ -498,7 +498,7 @@ var GF = function(){
 
 		this.victory = function(){
 			this.ctx.font = "bold 55px Arial";
-			this.ctx.fillStyle = "green";
+			this.ctx.fillStyle = "yellow";
 			this.ctx.textAlign = "center";
 			this.ctx.fillText("VICTORY", 260, 300);
 		};
@@ -723,6 +723,32 @@ var GF = function(){
 	thisLevel.loadLevel( thisGame.getLevelNum() );
 	// thisLevel.printMap(); 
 	
+
+	let musicaFondo = new Audio();
+	let musicaEfecto = new Audio();
+	
+	var tocar = function(url,tipo){
+
+		loadAudio(url,tipo).then( audio => audio.play());
+	}
+
+	var loadAudio = function(url,tipo){
+		return new Promise(resolve => {
+			if (tipo=="efecto") {
+				musicaEfecto.addEventListener('canplaythrough',() =>{
+					resolve(musicaEfecto);
+				});
+				musicaEfecto.src = url;
+			} else{
+				musicaFondo.addEventListener('canplaytrough',() =>{
+					resolve(musicaFondo);
+				});
+				musicaFondo.src = url;
+			}
+		})
+	}
+	
+
 	// >=test2
 	var measureFPS = function(newTime){
 		// la primera ejecución tiene una condición especial
@@ -885,6 +911,8 @@ var GF = function(){
 				ghosts[i].draw();
 			}
 			thisLevel.gameOver();
+			//música game over
+			tocar("res/sounds/game_over.mp3","fondo");
 		} else if(thisGame.mode == thisGame.VICTORY){
 			//punto12
 			clearCanvas();
@@ -987,6 +1015,7 @@ var GF = function(){
 		
 		// >=test14
 		thisGame.setMode( thisGame.NORMAL);
+
 	};
 	
 	// >=test1
@@ -1002,6 +1031,9 @@ var GF = function(){
 
 		// >=test7
 		reset();
+
+		//música de fondo
+		tocar("res/sounds/fondo.mp3","fondo");
 
 		// start the animation
 		requestAnimationFrame(mainLoop);
